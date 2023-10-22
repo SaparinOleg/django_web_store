@@ -27,6 +27,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+AUTH_USER_MODEL = 'core.User'
 
 # Application definition
 
@@ -76,8 +77,12 @@ WSGI_APPLICATION = 'web_store.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'django_store',
+        'USER': 'pif',
+        'PASSWORD': 'tyu',
+        'HOST': 'localhost',
+        'PORT': '5432'
     }
 }
 
