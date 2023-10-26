@@ -1,10 +1,7 @@
-<!DOCTYPE html>
+{% extends "base.html" %}
+{% load static %}
 
-<html>
-<head>
-    <title> web-store </title>
-</head>
-<body>
-<h1> Welcome! </h1>
-</body>
-</html>
+{% block title %} Home {% endblock %}
+{% block content %}
+    <p> Welcome to Web Store{% if user.is_authenticated  %}, {{ user }}{% endif %}! </p>
+{% endblock %}
