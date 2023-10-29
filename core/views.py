@@ -2,12 +2,12 @@ from django.contrib.auth import login
 from django.contrib.auth.mixins import AccessMixin, LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.views import LoginView, LogoutView
 from django.http import HttpResponseRedirect
-from django.views import View
-from django.views.generic import TemplateView
-from django.views.generic.edit import FormView
+from django.views.generic import TemplateView, ListView
+from django.views.generic.edit import FormView, UpdateView
 from django.urls import reverse, reverse_lazy
 
 from core.forms import RegistrationForm
+from core.models import Product
 
 
 class SuperuserRequiredMixin(UserPassesTestMixin, AccessMixin):
@@ -51,8 +51,11 @@ class LogoutUserView(LogoutView):
         return reverse('core:home')
 
 
-class ProductsListView(TemplateView):
+class ProductsListView(ListView):
     template_name = 'products_list.html'
+    model = Product
+    ordering = ['price']
+    paginate_by = 3
 
 
 class ProductsNewView(SuperuserRequiredMixin, TemplateView):

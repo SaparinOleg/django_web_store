@@ -1,7 +1,48 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 {% load static %}
 
 {% block title %} Products {% endblock %}
 {% block content %}
-    <p> Products list </p>
+    <h2 font-size> Список товаров: </h2>
+    <ul>
+        {% for product in object_list %}
+            <li>
+                <h3>{{ product.name }}</h3>
+                <p> Цена: ${{ product.price }} | В наличии: {{ product.quantity }} </p>
+                <p> Описание: {{ product.description }} </p>
+                <form method="post">
+                    {% csrf_token %}
+
+                    {% if request.user.is_authenticated %}
+                        <input type="number" name="quantity" value="0" min="0" max="{{ product.quantity }}" step="1">
+                        <input type="submit" value="Купить">
+                        {% if request.user.is_superuser %}
+                            <a href="{% url 'core:products_edit' %}"> Изменить </a>
+                        {% endif %}
+                    {% endif %}
+
+                </form>
+                <br>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <div class="pagination">
+    <span class="step-links">
+
+        {% if page_obj.has_previous %}
+            <a href="?page=1"> << </a>
+            <a href="?page={{ page_obj.previous_page_number }}">| < |</a>
+        {% endif %}
+
+            стр. {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">| > |</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}"> >> </a>
+        {% endif %}
+
+    </span>
+    </div>
+
 {% endblock %}

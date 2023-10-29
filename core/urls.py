@@ -1,6 +1,16 @@
 from django.urls import path
-from .views import RegistrationView, HomeView, LoginUserView, LogoutUserView, ProductsListView, ProductsNewView, \
-    ProductsEditView, PurchasesListView, RefundsListView
+
+from core.views import (
+    HomeView,
+    RegistrationView,
+    LoginUserView,
+    LogoutUserView,
+    ProductsListView,
+    ProductsNewView,
+    ProductsEditView,
+    PurchasesListView,
+    RefundsListView
+)
 
 app_name = 'core'
 

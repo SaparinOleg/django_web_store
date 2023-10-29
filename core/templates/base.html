@@ -4,17 +4,20 @@
 <html>
 
 <head>
-    <title>{% block title %}{% endblock %}</title>
+    <title> {% block title %}{% endblock %} </title>
     <link href="{% static 'css/main.css' %}?{% now 'U' %}" rel="stylesheet">
 </head>
 
 <body>
+
 <header>
-    <h1>Web Store</h1>
+    <h1> Базар мимопроходцев </h1>
     {% include "navigation_bar.html" %}
 </header>
+
 {% block content %}
 {% endblock %}
+
 </body>
 
 </html>
