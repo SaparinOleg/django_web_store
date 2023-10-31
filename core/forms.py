@@ -1,7 +1,7 @@
 from django.contrib.auth.forms import UserCreationForm
 from django import forms
 
-from core.models import User
+from core.models import User, Purchase
 
 
 class RegistrationForm(UserCreationForm):
@@ -14,3 +14,11 @@ class RegistrationForm(UserCreationForm):
             'email': forms.EmailInput(),
             'password': forms.PasswordInput(),
         }
+
+
+class PurchaseForm(forms.ModelForm):
+    quantity = forms.IntegerField(required=True)
+
+    class Meta:
+        model = Purchase
+        fields = ['quantity']

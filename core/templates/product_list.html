@@ -12,12 +12,12 @@
                 <p> Описание: {{ product.description }} </p>
                 <form method="post">
                     {% csrf_token %}
-
+                    {{ form.as_p }}
                     {% if request.user.is_authenticated %}
-                        <input type="number" name="quantity" value="0" min="0" max="{{ product.quantity }}" step="1">
+                        <input type="number" name="quantity" value="1" min="0" max="{{ product.quantity }}" step="1">
                         <input type="submit" value="Купить">
                         {% if request.user.is_superuser %}
-                            <a href="{% url 'core:products_edit' %}"> Изменить </a>
+                            <a href="{% url 'core:product_edit' product.pk %}"> Изменить </a>
                         {% endif %}
                     {% endif %}
 

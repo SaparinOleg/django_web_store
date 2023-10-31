@@ -1,13 +1,14 @@
+from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.mixins import AccessMixin, LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.views import LoginView, LogoutView
 from django.http import HttpResponseRedirect
 from django.views.generic import TemplateView, ListView
-from django.views.generic.edit import FormView, UpdateView
+from django.views.generic.edit import FormView, UpdateView, CreateView
 from django.urls import reverse, reverse_lazy
 
-from core.forms import RegistrationForm
-from core.models import Product
+from core.forms import RegistrationForm, PurchaseForm
+from core.models import Product, Purchase, User
 
 
 class SuperuserRequiredMixin(UserPassesTestMixin, AccessMixin):
@@ -41,37 +42,44 @@ class LoginUserView(LoginView):
     template_name = 'registration/login.html'
 
     def get_success_url(self):
-        return reverse('core:home')
+        return reverse_lazy('core:home')
 
 
 class LogoutUserView(LogoutView):
     template_name = 'registration/logout.html'
 
     def get_success_url(self):
-        return reverse('core:home')
+        return reverse_lazy('core:home')
 
 
-class ProductsListView(ListView):
-    template_name = 'products_list.html'
+class ProductListView(ListView):
+    template_name = 'product_list.html'
     model = Product
     ordering = ['price']
     paginate_by = 3
 
 
-class ProductsNewView(SuperuserRequiredMixin, TemplateView):
-    template_name = 'products_new.html'
+class ProductAddView(SuperuserRequiredMixin, CreateView):
+    template_name = 'product_add.html'
+    model = Product
+    fields = ['name', 'description', 'price', 'quantity']
+    success_url = reverse_lazy('core:products')
+
+
+class ProductEditView(SuperuserRequiredMixin, UpdateView):
+    template_name = 'product_edit.html'
+    model = Product
     login_url = 'core:products'
+    fields = ['name', 'description', 'price', 'quantity']
+
+    def get_success_url(self):
+        return reverse_lazy('core:products')
 
 
-class ProductsEditView(SuperuserRequiredMixin, TemplateView):
-    template_name = 'products_edit.html'
-    login_url = 'core:products'
-
-
-class PurchasesListView(LoginRequiredMixin, TemplateView):
-    template_name = 'purchases_list.html'
+class PurchaseListView(LoginRequiredMixin, TemplateView):
+    template_name = 'purchase_list.html'
     login_url = 'core:login'
 
 
 class RefundsListView(SuperuserRequiredMixin, TemplateView):
-    template_name = 'refunds_list.html'
+    template_name = 'refund_list.html'

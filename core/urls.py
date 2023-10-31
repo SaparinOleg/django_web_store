@@ -5,10 +5,10 @@ from core.views import (
     RegistrationView,
     LoginUserView,
     LogoutUserView,
-    ProductsListView,
-    ProductsNewView,
-    ProductsEditView,
-    PurchasesListView,
+    ProductListView,
+    ProductAddView,
+    ProductEditView,
+    PurchaseListView,
     RefundsListView
 )
 
@@ -19,9 +19,9 @@ urlpatterns = [
     path('register/', RegistrationView.as_view(), name='register'),
     path('login/', LoginUserView.as_view(), name='login'),
     path('logout/', LogoutUserView.as_view(), name='logout'),
-    path('products', ProductsListView.as_view(), name='products'),
-    path('products/new', ProductsNewView.as_view(), name='products_new'),
-    path('products/edit', ProductsEditView.as_view(), name='products_edit'),
-    path('purchases', PurchasesListView.as_view(), name='purchases'),
-    path('refunds', RefundsListView.as_view(), name='refunds'),
+    path('products', ProductListView.as_view(), name='products'),
+    path('products/new', ProductAddView.as_view(), name='product_add'),
+    path('products/<int:pk>/edit/', ProductEditView.as_view(), name='product_edit'),
+    path('purchases/', PurchaseListView.as_view(), name='purchases'),
+    path('refunds/', RefundsListView.as_view(), name='refunds'),
 ]
