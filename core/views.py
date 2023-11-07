@@ -52,18 +52,63 @@ class LogoutUserView(LogoutView):
         return reverse_lazy('core:home')
 
 
-class ProductListView(ListView):
-    template_name = 'product_list.html'
-    model = Product
-    ordering = ['price']
-    paginate_by = 3
-
-
 class ProductAddView(SuperuserRequiredMixin, CreateView):
     template_name = 'product_add.html'
     model = Product
     fields = ['name', 'description', 'price', 'quantity']
     success_url = reverse_lazy('core:products')
+
+
+class ProductPurchaseView(LoginRequiredMixin, CreateView):
+    login_url = 'login'
+    form_class = PurchaseForm
+    success_url = reverse_lazy('core:products')
+
+    def form_valid(self, form):
+        product_pk = self.request.POST.get('product_pk')
+        product = Product.objects.get(id=product_pk)
+        quantity = int(self.request.POST.get('quantity'))
+        user = self.request.user
+        page_number = self.request.GET.get('page')
+
+        flag = True
+        if product.price * quantity > user.wallet:
+            messages.error(self.request, "Not enough cash")
+            flag = False
+
+        if product.quantity < quantity:
+            messages.error(self.request, "Not enough products")
+            flag = False
+
+        if flag:
+            purchase = Purchase(quantity=quantity, user=user, product=product)
+            purchase.save()
+
+            product.quantity -= quantity
+            product.save()
+
+            user.wallet -= product.price * quantity
+            user.save()
+
+            messages.success(self.request, 'Successful purchase')
+
+        return HttpResponseRedirect(f"{self.success_url}?page={page_number}")
+
+    def form_invalid(self, form):
+        quantity = int(self.request.POST.get('quantity'))
+        page_number = self.request.GET.get('page')
+
+        if not quantity:
+            messages.warning(self.request, "You need to select the quantity of the product")
+
+        return HttpResponseRedirect(f"{self.success_url}?page={page_number}")
+
+
+class ProductListView(ListView):
+    template_name = 'product_list.html'
+    model = Product
+    ordering = ['price']
+    paginate_by = 3
 
 
 class ProductEditView(SuperuserRequiredMixin, UpdateView):

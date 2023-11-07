@@ -17,7 +17,7 @@ class RegistrationForm(UserCreationForm):
 
 
 class PurchaseForm(forms.ModelForm):
-    quantity = forms.IntegerField(required=True)
+    quantity = forms.IntegerField(min_value=1)
 
     class Meta:
         model = Purchase

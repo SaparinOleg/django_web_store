@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, Group, Permission
+from django.utils import timezone
 
 
 class User(AbstractUser):
@@ -22,9 +23,12 @@ class Product(models.Model):
 
 class Purchase(models.Model):
     quantity = models.PositiveIntegerField()
-    purchase_datetime = models.DateTimeField(auto_now_add=True)
+    purchased_at = models.DateTimeField(default=timezone.now)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_purchases')
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='product_purchases')
+
+    def __str__(self):
+        return f'{self.quantity} pcs. of {self.product.name} purchased by {self.user.username} at {self.purchased_at}'
 
 
 class Refund(models.Model):

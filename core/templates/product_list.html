@@ -3,25 +3,25 @@
 
 {% block title %} Products {% endblock %}
 {% block content %}
-    <h2 font-size> Список товаров: </h2>
+    <h2> Список товаров: </h2>
     <ul>
         {% for product in object_list %}
             <li>
                 <h3>{{ product.name }}</h3>
                 <p> Цена: ${{ product.price }} | В наличии: {{ product.quantity }} </p>
                 <p> Описание: {{ product.description }} </p>
-                <form method="post">
+                <form method="post" action="{% url 'core:product_purchase' %}?page={{ page_obj.number }}">
                     {% csrf_token %}
                     {{ form.as_p }}
+                    <input type="hidden" name="product_pk" value={{ product.pk }}>
                     {% if request.user.is_authenticated %}
-                        <input type="number" name="quantity" value="1" min="0" max="{{ product.quantity }}" step="1">
-                        <input type="submit" value="Купить">
-                        {% if request.user.is_superuser %}
-                            <a href="{% url 'core:product_edit' product.pk %}"> Изменить </a>
-                        {% endif %}
+                        <input type="number" name="quantity" value="1" min="0" max="999" step="1">
+                        <input type="submit" name="action" value="Купить">
                     {% endif %}
-
                 </form>
+                {% if request.user.is_superuser %}
+                    <a href="{% url 'core:product_edit' product.pk %}"> Изменить </a>
+                {% endif %}
                 <br>
             </li>
         {% endfor %}
@@ -35,7 +35,7 @@
             <a href="?page={{ page_obj.previous_page_number }}">| < |</a>
         {% endif %}
 
-            стр. {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}
+        стр. {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}
 
         {% if page_obj.has_next %}
             <a href="?page={{ page_obj.next_page_number }}">| > |</a>

@@ -9,7 +9,8 @@ from core.views import (
     ProductAddView,
     ProductEditView,
     PurchaseListView,
-    RefundsListView
+    RefundsListView,
+    ProductPurchaseView,
 )
 
 app_name = 'core'
@@ -19,9 +20,10 @@ urlpatterns = [
     path('register/', RegistrationView.as_view(), name='register'),
     path('login/', LoginUserView.as_view(), name='login'),
     path('logout/', LogoutUserView.as_view(), name='logout'),
-    path('products', ProductListView.as_view(), name='products'),
-    path('products/new', ProductAddView.as_view(), name='product_add'),
+    path('products/', ProductListView.as_view(), name='products'),
+    path('products/new/', ProductAddView.as_view(), name='product_add'),
     path('products/<int:pk>/edit/', ProductEditView.as_view(), name='product_edit'),
+    path('products/purchase/', ProductPurchaseView.as_view(), name='product_purchase'),
     path('purchases/', PurchaseListView.as_view(), name='purchases'),
     path('refunds/', RefundsListView.as_view(), name='refunds'),
 ]

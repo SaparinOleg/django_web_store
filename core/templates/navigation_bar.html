@@ -13,11 +13,11 @@
 
         {% if request.user.is_superuser %}
             <a href="{% url 'core:product_add' %}"> Add product </a>
-{#            <a href="{% url 'core:products_edit' pk=product.pk %}"> Edit product </a>#}
             <a href="{% url 'core:refunds' %}"> Refunds </a>
         {% endif %}
 
         <a href="{% url 'core:logout' %}"> Logout </a>
+        Счёт: {{ request.user.wallet }} денег
     {% endif %}
 
 {% endblock %}
