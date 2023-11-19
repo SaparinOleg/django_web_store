@@ -24,13 +24,18 @@ class Product(models.Model):
 class Purchase(models.Model):
     quantity = models.PositiveIntegerField()
     purchased_at = models.DateTimeField(default=timezone.now)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_purchases')
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='product_purchases')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='purchases')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='purchases')
 
     def __str__(self):
-        return f'{self.quantity} pcs. of {self.product.name} purchased by {self.user.username} at {self.purchased_at}'
+        return f'{self.quantity} pcs. of {self.product.name.upper()} purchased by {self.user.username.upper()} ' \
+               f'at {self.purchased_at}'
 
 
 class Refund(models.Model):
     request_datetime = models.DateTimeField(auto_now_add=True)
     purchase = models.OneToOneField(Purchase, on_delete=models.CASCADE, related_name='refund')
+
+    def __str__(self):
+        return f'{self.purchase.quantity} pcs. of {self.purchase.product.name.upper()} purchased ' \
+               f'by {self.purchase.user.username.upper()}'

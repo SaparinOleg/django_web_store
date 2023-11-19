@@ -1,14 +1,17 @@
+from datetime import timedelta
+
 from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.mixins import AccessMixin, LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.views import LoginView, LogoutView
 from django.http import HttpResponseRedirect
+from django.utils import timezone
 from django.views.generic import TemplateView, ListView
-from django.views.generic.edit import FormView, UpdateView, CreateView
+from django.views.generic.edit import FormView, UpdateView, CreateView, DeleteView
 from django.urls import reverse, reverse_lazy
 
-from core.forms import RegistrationForm, PurchaseForm
-from core.models import Product, Purchase, User
+from core.forms import RegistrationForm, PurchaseForm, RefundForm
+from core.models import Product, Purchase, User, Refund
 
 
 class SuperuserRequiredMixin(UserPassesTestMixin, AccessMixin):
@@ -121,10 +124,77 @@ class ProductEditView(SuperuserRequiredMixin, UpdateView):
         return reverse_lazy('core:products')
 
 
-class PurchaseListView(LoginRequiredMixin, TemplateView):
+class PurchaseListView(LoginRequiredMixin, ListView):
     template_name = 'purchase_list.html'
+    model = Purchase
     login_url = 'core:login'
+    context_object_name = 'purchases'
+    paginate_by = 10
+
+    def get_queryset(self):
+        ordering = self.request.GET.get('ordering', 'purchased_at')
+        return Purchase.objects.filter(user=self.request.user)
 
 
-class RefundsListView(SuperuserRequiredMixin, TemplateView):
+class RefundsListView(SuperuserRequiredMixin, ListView):
     template_name = 'refund_list.html'
+    model = Refund
+    login_url = 'core:login'
+    context_object_name = 'refunds'
+    paginate_by = 3
+
+    def get_queryset(self):
+        return Refund.objects.get_queryset()
+
+
+class PurchaseRefundView(LoginRequiredMixin, CreateView):
+    login_url = 'login'
+    form_class = RefundForm
+    success_url = reverse_lazy('core:purchases')
+
+    def form_valid(self, form):
+        purchase_pk = self.request.POST.get('purchase_pk')
+        purchase = Purchase.objects.get(id=purchase_pk)
+
+        if len(Refund.objects.filter(purchase=purchase)):
+            messages.error(self.request, "Refund already created")
+        elif timezone.now() - purchase.purchased_at > timedelta(minutes=3):
+            messages.error(self.request, "Time's up! You had a total of 3 minutes for the refund")
+        else:
+            refund = form.save(commit=False)
+            refund.purchase = purchase
+            refund.save()
+            messages.success(self.request, "Your refund has been successfully initiated and is currently under review")
+        return HttpResponseRedirect(self.success_url)
+
+
+class RefundsAcceptView(SuperuserRequiredMixin, CreateView):
+    login_url = 'login'
+    model = Refund
+    success_url = reverse_lazy('core:refunds')
+
+    def post(self, request, *args, **kwargs):
+        refund = self.get_object()
+        purchase = refund.purchase
+        product = purchase.product
+        user = purchase.user
+
+        product.quantity += purchase.quantity
+        product.save()
+        user.wallet += purchase.product.price * purchase.quantity
+        user.save()
+
+        purchase.delete()
+        refund.delete()
+        return HttpResponseRedirect(self.success_url)
+
+
+class RefundsDeclineView(SuperuserRequiredMixin, DeleteView):
+    login_url = 'login'
+    model = Refund
+    success_url = reverse_lazy('core:refunds')
+
+    def post(self, request, *args, **kwargs):
+        refund = self.get_object()
+        refund.delete()
+        return HttpResponseRedirect(self.success_url)

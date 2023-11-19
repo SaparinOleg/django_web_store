@@ -3,5 +3,40 @@
 
 {% block title %} Refunds {% endblock %}
 {% block content %}
-    <p> Refunds list </p>
+    <h2> Список возвратов: </h2>
+    <ul>
+        {% for refund in refunds %}
+            <li>
+                <h3>{{ refund }}</h3>
+
+                <form method="post" action="{% url 'core:refunds_accept' refund.id %}">
+                    {% csrf_token %}
+                    <button type="submit"> Принять</button>
+                </form>
+                <br>
+                <form method="post" action="{% url 'core:refunds_decline' refund.id %}">
+                    {% csrf_token %}
+                    <button type="submit"> Отклонить</button>
+                </form>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <div class="pagination">
+    <span class="step-links">
+
+        {% if page_obj.has_previous %}
+            <a href="?page=1"> << </a>
+            <a href="?page={{ page_obj.previous_page_number }}">| < |</a>
+        {% endif %}
+
+        стр. {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">| > |</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}"> >> </a>
+        {% endif %}
+
+    </span>
+    </div>
 {% endblock %}

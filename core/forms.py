@@ -1,7 +1,7 @@
 from django.contrib.auth.forms import UserCreationForm
 from django import forms
 
-from core.models import User, Purchase
+from core.models import User, Purchase, Refund
 
 
 class RegistrationForm(UserCreationForm):
@@ -22,3 +22,9 @@ class PurchaseForm(forms.ModelForm):
     class Meta:
         model = Purchase
         fields = ['quantity']
+
+
+class RefundForm(forms.ModelForm):
+    class Meta:
+        model = Refund
+        fields = []
