@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+{% load static %}
+
+<html>
+
+<head>
+    <title> {% block title %}{% endblock %} </title>
+    <link href="{% static 'css/main.css' %}?{% now 'U' %}" rel="stylesheet">
+</head>
+
+<body>
+{% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+<header>
+    <h1> Базар мимопроходцев </h1>
+    {% include "navigation_bar.html" %}
+</header>
+
+{% block content %}
+{% endblock %}
+
+</body>
+
+</html>

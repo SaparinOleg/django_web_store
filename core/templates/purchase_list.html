@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %} Purchases {% endblock %}
+{% block content %}
+    <h2> Список покупок: </h2>
+    <ul>
+        {% for purchase in purchases %}
+            <li>
+                <h3>{{ product.name }}</h3>
+                <form method="post" action="{% url 'core:purchase_refund' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="purchase_pk" value={{ purchase.pk }}>
+                    {{ purchase.product.name }} - ${{ purchase.product.price }} x {{ purchase.quantity }} шт.
+                    <button type="submit"> Возвратить</button>
+                </form>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <div class="pagination">
+    <span class="step-links">
+
+        {% if page_obj.has_previous %}
+            <a href="?page=1"> << </a>
+            <a href="?page={{ page_obj.previous_page_number }}">| < |</a>
+        {% endif %}
+
+        стр. {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">| > |</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}"> >> </a>
+        {% endif %}
+
+    </span>
+    </div>
+{% endblock %}
